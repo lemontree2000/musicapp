@@ -23,6 +23,26 @@ export default {};
     display: inline-block;
     vertical-align: top;
     margin-top: 6px;
+    width: 30px;
+    height: 32px;
+    margin-right: 9px;
+    .bg-image('/m-header/logo');
+    background-size: 30px 32px;
+  }
+  .text {
+    display: inline-block;
+    vertical-align: top;
+    line-height: 44px;
+    font-size: @font-size-large;
+  }
+  // 个人中心
+  .mine {
+    position: absolute;
+    top: 0;
+    right: 0;
+    .icon-mine {
+      display: block;
+    }
   }
 }
 
