@@ -15,7 +15,7 @@ export default new Router({
       redirect: '/recommend'
     },
     {
-      path: '/Rank',
+      path: '/rank',
       component: Rank
     },
     {
