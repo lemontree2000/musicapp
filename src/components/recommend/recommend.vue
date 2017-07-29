@@ -1,11 +1,43 @@
 <template>
   <div class="recommend">
-    recommend
+    <div class="recommend-content">
+      <div class="slider-wrapper">
+        <slider>
+          <div v-for="(item, index) in recommends" :key="item.id">
+
+          </div>
+        </slider>
+      </div>
+    </div>
   </div>  
 </template>
 
 <script>
-export default {};
+import Slider from 'base/slider/slider';
+import { getRecommend } from 'api/recommend';
+import { ERR_OK } from 'api/config';
+export default {
+  data () {
+    return {
+      recommends: []
+    };
+  },
+  components: {
+    Slider
+  },
+  methods: {
+    _getRecommend () {
+      getRecommend().then((res) => {
+        if (res.code === ERR_OK) {
+          this.recommends = res.data.slider;
+        }
+      });
+    }
+  },
+  created () {
+    this._getRecommend();
+  }
+};
 </script>
 
 <style lang="less" scoped>
