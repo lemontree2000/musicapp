@@ -8,7 +8,18 @@
 </template>
 
 <script>
-export default {};
+export default {
+  props: {
+    loop: {
+      type: Boolean,
+      default: true
+    },
+    autoPlay: {
+      type: Boolean,
+      default: true
+    }
+  }
+};
 </script>
 
 <style lang="less" scoped>

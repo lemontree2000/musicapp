@@ -4,7 +4,9 @@
       <div class="slider-wrapper">
         <slider>
           <div v-for="(item, index) in recommends" :key="item.id">
-
+            <a :href="item.linkUrl">
+              <img :src="item.picUrl" >
+            </a>
           </div>
         </slider>
       </div>
