@@ -53,9 +53,9 @@ export default {
   },
   methods: {
     _setSliderWidth(isResize) {
+      this.children = this.$refs.sliderGroup.children;
       let width = 0;
       let sliderWidth = this.$refs.slider.clientWidth;
-      this.children = this.$refs.sliderGroup.children;
       for (let i = 0; i < this.children.length; i++) {
         let child = this.children[i];
         addClass(child, 'slider-item');
@@ -75,8 +75,7 @@ export default {
         snap: true,
         snapLoop: this.loop,
         snapThreshold: 0.3,
-        snapSpeed: 400,
-        click: true
+        snapSpeed: 400
       });
       this.slider.on('scrollEnd', () => {
         let pageIndex = this.slider.getCurrentPage().pageX;
