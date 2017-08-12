@@ -3,13 +3,12 @@
     <div class="slider-group" ref="sliderGroup">
       <slot>
       </slot>
-    </div>
+    </div>      
     <div class="dots">
       <span class="dot" v-for="(item, index) in dots" :key="item" :class="{'active': currentPageIndex == index}"></span>
     </div>
-  </div>  
+  </div>
 </template>
-
 <script>
 import BScroll from 'better-scroll';
 import { addClass } from 'common/js/dom';
@@ -81,7 +80,6 @@ export default {
       });
       this.slider.on('scrollEnd', () => {
         let pageIndex = this.slider.getCurrentPage().pageX;
-        console.log(pageIndex);
         if (this.loop) {
           pageIndex -= 1;
         }

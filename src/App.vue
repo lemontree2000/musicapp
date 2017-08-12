@@ -7,7 +7,6 @@
     </keep-alive>
   </div>
 </template>
-
 <script>
 import MHeader from 'components/m-header/m-header';
 import MTab from 'components/tab/tab';

@@ -36,7 +36,7 @@ apiRoutes.get('/getDiscList', function(req, res) {
   }).then((response) => {
     res.json(response.data);
   }).catch((e) => {
-    console.log(e);
+    res.send(e);
   })
 });
 
