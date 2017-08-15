@@ -7,6 +7,10 @@
 <script>
 import {getSingerList} from 'api/singer';
 import {ERR_OK} from 'api/config';
+import Singer from 'common/js/singer.js';
+
+const HOT_NAME = '热门数据';
+const HOT_SINGER_LENTH = 10;
 export default {
   data() {
     return {
@@ -20,9 +24,52 @@ export default {
     _getSingerList() {
       getSingerList().then((res) => {
         if (res.code === ERR_OK) {
-          console.log(res.data);
+          console.log(this._normalizeSinger(res.data.list));
         }
       });
+    },
+    _normalizeSinger(list) {
+      let map = {
+        hot: {
+          title: HOT_NAME,
+          item: []
+        }
+      };
+      list.forEach(function(item, index) {
+        if (index < HOT_SINGER_LENTH) {
+          map.hot.item.push(new Singer({
+            id: item.Fsinger_mid,
+            name: item.Fsinger_name
+          }));
+        }
+        const key = item.Findex;
+        if (!map[key]) {
+          map[key] = {
+            title: key,
+            items: []
+          };
+        }
+        map[key].items.push(new Singer({
+          id: item.Fsinger_mid,
+          name: item.Fsinger_name
+        }));
+      }, this);
+      //  处理map, 排序
+      let hot = [];
+      let ret = [];
+      for (let key in map) {
+        let val = map[key];
+        if (val.title.match(/[a-zA-Z]/)) {
+          ret.push(val);
+        } else if (val.title === HOT_NAME) {
+          hot.push(val);
+        }
+      }
+      ret.sort((a, b) => {
+        return a.title.charCodeAt(0) - b.title.charCodeAt(0);
+      });
+
+      return hot.concat(ret);
     }
   }
 };
