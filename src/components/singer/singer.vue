@@ -1,6 +1,6 @@
 <template>
   <div class="singer">
-    singer
+    <list-view :data="singers"></list-view>
   </div>  
 </template>
 
@@ -8,6 +8,7 @@
 import {getSingerList} from 'api/singer';
 import {ERR_OK} from 'api/config';
 import Singer from 'common/js/singer.js';
+import ListView from 'base/listview/listview';
 
 const HOT_NAME = '热门数据';
 const HOT_SINGER_LENTH = 10;
@@ -17,6 +18,9 @@ export default {
       singers: []
     };
   },
+  components: {
+    ListView
+  },
   created() {
     this._getSingerList();
   },
@@ -24,7 +28,7 @@ export default {
     _getSingerList() {
       getSingerList().then((res) => {
         if (res.code === ERR_OK) {
-          console.log(this._normalizeSinger(res.data.list));
+          this.singers = this._normalizeSinger(res.data.list);
         }
       });
     },
