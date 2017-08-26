@@ -1,10 +1,19 @@
 <template>
-  <scroll class="listview" :data="data" ref="listview">
+  <scroll class="listview" 
+          @scroll="scroll"
+          :data="data" 
+          ref="listview" 
+          :listenScroll="ListenScroll"
+          :probeType="probeType"
+    >
     <ul>
       <li v-for="group in data" class="list-group" :key="group.title" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li v-for="item in group.items" class="list-group-item" :key="item.name">
+          <li v-for="item in group.items"
+              class="list-group-item" 
+              :key="item.name"
+          >
             <img v-lazy="item.avatar" class="avatar" alt="">
             <span class="name">{{item.name}}</span>
           </li>
@@ -13,7 +22,12 @@
     </ul>
     <div class="list-shortcut" @touchmove.stop.prevent="onShortcurTouchMove" @touchstart="onShortcurTouchStart">
       <ul>
-        <li class="item" v-for="(item, index) in shortcutList" :key="item" :data-index="index">{{item}}</li>
+        <li class="item"
+            :class="{'current': currentIndex == index}" 
+            v-for="(item, index) in shortcutList" 
+            :key="item" 
+            :data-index="index"
+        >{{item}}</li>
       </ul>
     </div>
   </scroll>
@@ -26,13 +40,22 @@ import { getData } from 'common/js/dom';
 const ANCHOR_HEIGHT = 18;
 export default {
   created() {
+    this.probeType = 3;
+    this.ListenScroll = true;
     this.touch = {};
+    this.listHeight = [];
   },
   props: {
     data: {
       type: Array,
       default: []
     }
+  },
+  data() {
+    return {
+      scrollY: -1,
+      currentIndex: 0
+    };
   },
   components: {
     Scroll
@@ -59,10 +82,44 @@ export default {
       let anchorIndex = parseInt(this.touch.achorIndex) + delta;
       this._scrollTo(anchorIndex);
     },
+    scroll(pos) {
+      this.scrollY = pos.y;
+      console.log(pos);
+    },
     _scrollTo(anchorIndex) {
       this.$refs.listview.scrollToElement(
         this.$refs.listGroup[anchorIndex], 0
       );
+    },
+    _calculateHeight() {
+      this.listHeight = [];
+      const list = this.$refs.listGroup;
+      let height = 0;
+      this.listHeight.push(height);
+      for (let i = 0; i < list.length; i++) {
+        let item = list[i];
+        height = item.clientHeight;
+        this.listHeight.push(height);
+      }
+    }
+  },
+  watch: {
+    data() {
+      setTimeout(() => {
+        this._calculateHeight();
+      }, 20);
+    },
+    scrollY(newY) {
+      const listHeight = this.listHeight;
+      for (let i = 0; i < listHeight.length; i++) {
+        let height1 = listHeight[i];
+        let height2 = listHeight[i + 1];
+        if (!height2 || (-newY > height1 && -newY < height2)) {
+          this.currentIndex = i;
+          return;
+        }
+      }
+      this.currentIndex = 0;
     }
   }
 };

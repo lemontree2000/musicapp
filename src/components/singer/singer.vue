@@ -36,12 +36,12 @@ export default {
       let map = {
         hot: {
           title: HOT_NAME,
-          item: []
+          items: []
         }
       };
       list.forEach(function(item, index) {
         if (index < HOT_SINGER_LENTH) {
-          map.hot.item.push(new Singer({
+          map.hot.items.push(new Singer({
             id: item.Fsinger_mid,
             name: item.Fsinger_name
           }));
