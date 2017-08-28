@@ -84,7 +84,6 @@ export default {
     },
     scroll(pos) {
       this.scrollY = pos.y;
-      console.log(pos);
     },
     _scrollTo(anchorIndex) {
       this.$refs.listview.scrollToElement(
@@ -98,9 +97,10 @@ export default {
       this.listHeight.push(height);
       for (let i = 0; i < list.length; i++) {
         let item = list[i];
-        height = item.clientHeight;
+        height += item.clientHeight;
         this.listHeight.push(height);
       }
+      console.log();
     }
   },
   watch: {
