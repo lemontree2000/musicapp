@@ -13,6 +13,7 @@
           <li v-for="item in group.items"
               class="list-group-item" 
               :key="item.name"
+              @click="selectItem(item)"
           >
             <img v-lazy="item.avatar" class="avatar" alt="">
             <span class="name">{{item.name}}</span>
@@ -86,6 +87,9 @@ export default {
     }
   },
   methods: {
+    selectItem(item) {
+      this.$emit('select', item);
+    },
     onShortcurTouchStart(e) {
       let anchorIndex = getData(e.target, 'index');
       let firstTouch = e.touches[0];
