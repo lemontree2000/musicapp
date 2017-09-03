@@ -36,7 +36,6 @@ function filterSinger(singer) {
 }
 
 function hanleImage(id) {
-  var url = `https://y.gtimg.cn/music/photo_new/T002R300x300M
-  000${id}.jpg?max_age=2592000`;
+  var url = `https://y.gtimg.cn/music/photo_new/T002R300x300M000${id}.jpg?max_age=2592000`;
   return url;
 }
