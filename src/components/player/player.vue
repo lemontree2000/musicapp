@@ -5,7 +5,7 @@
         <img :src="currentSong.image" width="100%" height="100%" alt="">
       </div>
       <div class="top">
-        <div class="back">
+        <div class="back" @click="back">
           <div class="icon-back"></div>
         </div>
         <h1 class="title" v-html="currentSong.name"></h1>
@@ -16,7 +16,6 @@
           <div class="cd-wrapper">
             <div class="cd">
               <img class="image" :src="currentSong.image">
-              
             </div>
           </div>
         </div>
@@ -58,7 +57,7 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex';
+import {mapGetters, mapMutations} from 'vuex';
 
 export default {
   computed: {
@@ -66,7 +65,15 @@ export default {
       'fullScreen',
       'playList',
       'currentSong'
-    ])
+    ]),
+    ...mapMutations({
+      setFullSCreen: 'SET_FULL_SCREEN'
+    })
+  },
+  methods: {
+    back() {
+      this.setFullSCreen(false);
+    }
   }
 };
 </script>
