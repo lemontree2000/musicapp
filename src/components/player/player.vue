@@ -4,7 +4,7 @@
                 @enter="enter"
                 @after-enter="afterEnter"
                 @leave="leave"
-                @after-leave="afterLeave"
+                @after-leave="afterLeave"         
     >
       <div class="normal-player" v-show="fullScreen">
         <div class="background">
@@ -19,26 +19,33 @@
         </div>
         <div class="middle">
           <div class="middle-l">
-            <div class="cd-wrapper" ref="cdWraper">
-              <div class="cd">
+            <div class="cd-wrapper" ref="cdWraper" >
+              <div class="cd" :class="cdClass">
                 <img class="image" :src="currentSong.image">
               </div>
             </div>
           </div>
         </div>
         <div class="bottom">
+          <div class="progress-wrapper">
+            <span class="time time-l" v-text="format(currentTime)"></span>
+            <div class="progress-bar-wrapper">
+              <progress-bar :percent="percent" @percentChange="onProgressChange"></progress-bar>
+            </div>
+            <span class="time time-r">{{format(currentSong.duration)}}</span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
-              <i class="icon-sequence"></i>
+              <i :class="iconMode" @click="changeMode"></i>
             </div>
-            <div class="icon i-left">
-              <i class="icon-prev"></i>
+            <div class="icon i-left" :class="disableCls">
+              <i class="icon-prev" @click="prev" ></i>
             </div>
-            <div class="icon i-center">
-              <i class="icon-play"></i>
+            <div class="icon i-center" :class="disableCls">
+              <i :class="playIcon" @click="togglePlaying" ></i>
             </div>
-            <div class="icon i-right">
-              <i class="icon-next"></i>
+            <div class="icon i-right" :class="disableCls">
+              <i class="icon-next" @click="next" ></i>
             </div>
             <div class="icon i-right">
               <i class="icon icon-not-favorite"></i>
@@ -47,58 +54,114 @@
         </div>
       </div>
     </transition>
-    <transition>
+    <transition name="mini">
       <div class="mini-player" @click="setFullSCreen" v-show="!fullScreen">
         <div class="icon">
-          <img :src="currentSong.image" width="40" height="40" alt="">
+          <img :src="currentSong.image" :class="cdClass" width="40" height="40" alt="">
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
-        <div class="control"></div>
+        <div class="control">
+          <progress-circle :radius="radius" :percent="percent">
+            <i :class="miniIcon" @click.prevent.stop="togglePlaying" class="icon-mini"></i>
+          </progress-circle>
+        </div>
         <div class="control">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+    <audio ref="audio" :src="currentSong.url" @ended="end" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
 <script>
 import {mapGetters, mapMutations} from 'vuex';
 import animations from 'create-keyframe-animation';
+import {prefixStyle} from 'common/js/dom';
+import progressBar from 'base/progress-bar/progress-bar';
+import progressCircle from 'base/progress-circle/progress-circle';
+import {playMode} from 'common/js/config';
+import {shuffle} from 'common/js/util';
+
+const transform = prefixStyle('transform');
 export default {
+  data() {
+    return {
+      songReady: false,
+      currentTime: 0,
+      radius: 32
+    };
+  },
+  components: {
+    progressBar,
+    progressCircle
+  },
   computed: {
     ...mapGetters([
       'fullScreen',
       'playList',
-      'currentSong'
-    ])
+      'currentSong',
+      'playing',
+      'currentIndex',
+      'mode',
+      'sequenceList'
+    ]),
+    playIcon() {
+      return this.playing ? 'icon-pause' : 'icon-play';
+    },
+    miniIcon() {
+      return this.playing ? 'icon-pause-mini' : 'icon-play-mini';
+    },
+    cdClass() {
+      return this.playing ? 'play' : 'play pause';
+    },
+    disableCls() {
+      return this.songReady ? '' : 'disable';
+    },
+    percent() {
+      return this.currentTime / this.currentSong.duration;
+    },
+    iconMode() {
+      return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random';
+    }
   },
   methods: {
     ...mapMutations({
-      setFullSCreen: 'SET_FULL_SCREEN'
+      setFullSCreen: 'SET_FULL_SCREEN',
+      setPlayingState: 'SET_PLAYING_STATE',
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setPlayMode: 'SET_PLAY_MODE',
+      setPlayList: 'SET_PLAYLIST'
     }),
+    updateTime(e) {
+      this.currentTime = e.target.currentTime;
+    },
     back() {
       this.setFullSCreen(false);
     },
     open() {
       this.setFullSCreen(true);
     },
+    togglePlaying() {
+      this.setPlayingState(!this.playing);
+    },
     enter(el, done) {
       const {x, y, scale} = this._getPosAndScale();
       let animation = {
         0: {
-          transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`
+          transform: `translate3d(${x}px,${y}px,0) scale(${scale})`
         },
         60: {
-          transform: `translate3d(0, 0, 0) scale(1.1)`
+          transform: `translate3d(0,0,0) scale(1.1)`
         },
         100: {
-          transform: `translate3d(0, 0, 0) scale(1)`
+          transform: `translate3d(0,0,0) scale(1)`
         }
       };
+
       animations.registerAnimation({
         name: 'move',
         animation,
@@ -114,10 +177,14 @@ export default {
       this.$refs.cdWraper.style.animation = '';
     },
     leave(el, done) {
-
+      this.$refs.cdWraper.style.transition = `all 0.4s`;
+      const {x, y, scale} = this._getPosAndScale();
+      this.$refs.cdWraper.style[transform] = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+      this.$refs.cdWraper.addEventListener('transitionend', done);
     },
     afterLeave() {
-
+      this.$refs.cdWraper.style.transition = '';
+      this.$refs.cdWraper.style[transform] = '';
     },
     _getPosAndScale() {
       const targetWidth = 40;
@@ -126,13 +193,112 @@ export default {
       const paddingTop = 80;
       const width = window.innerWidth * 0.8;
       const scale = targetWidth / width;
-      const x = -(window.inderWidth / 2 - paddingLeft);
+      const x = -(window.innerWidth / 2 - paddingLeft);
       const y = window.innerHeight - paddingTop - width / 2 - paddingBottom;
       return {
         x,
         y,
         scale
       };
+    },
+    next() {
+      if (!this.songReady) {
+        return;
+      }
+      let index = this.currentIndex + 1;
+      if (index === this.playList.length) {
+        index = 0;
+      }
+      this.setCurrentIndex(index);
+      if (!this.playing) {
+        this.togglePlaying();
+      }
+      this.songReady = false;
+    },
+    prev() {
+      if (!this.songReady) {
+        return;
+      }
+      let index = this.currentIndex - 1;
+      if (index === -1) {
+        index = this.playList.length - 1;
+      }
+      this.setCurrentIndex(index);
+      if (!this.playing) {
+        this.togglePlaying();
+      }
+      this.songReady = false;
+    },
+    end() {
+      if (this.mode !== playMode.loop) {
+        this.next();
+      } else {
+        this.loop();
+      }
+    },
+    loop() {
+      this.$refs.audio.currentTime = 0;
+      this.$refs.audio.play();
+    },
+    ready() {
+      this.songReady = true;
+    },
+    error() {
+      this.songReady = true;
+    },
+    format(interval) {
+      interval = interval | 0;
+      const minute = interval / 60 | 0;
+      const second = interval % 60;
+      return `${this._pad(minute)}:${this._pad(second)}`;
+    },
+    onProgressChange(percent) {
+      this.$refs.audio.currentTime = this.currentSong.duration * percent;
+      if (!this.playing) {
+        this.togglePlaying();
+      }
+    },
+    changeMode() {
+      const mode = (this.mode + 1) % 3;
+      this.setPlayMode(mode);
+      let list = null;
+      if (mode === playMode.random) {
+        list = shuffle(this.sequenceList);
+      } else {
+        list = this.sequenceList;
+      };
+      this.resetCurrentIndex(list);
+      this.setPlayList(list);
+    },
+    resetCurrentIndex(list) {
+      let index = list.findIndex((item) => {
+        return item.id === this.currentSong.id;
+      });
+      this.setCurrentIndex(index);
+    },
+    _pad(num, n = 2) {
+      let len = num.toString().length;
+      while (len < n) {
+        num = '0' + num;
+        len++;
+      }
+      return num;
+    }
+  },
+  watch: {
+    currentSong(newSong, oldSong) {
+      if (newSong.id === oldSong.id) {
+        return;
+      }
+      this.$nextTick(function() {
+        this.$refs.audio.play();
+      });
+    },
+    playing(newPlaying) {
+      this.$nextTick(function() {
+        const audio = this.$refs.audio;
+        newPlaying ? audio.play() : audio.pause();
+      });
     }
   }
 };
