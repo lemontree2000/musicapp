@@ -85,6 +85,7 @@ import progressBar from 'base/progress-bar/progress-bar';
 import progressCircle from 'base/progress-circle/progress-circle';
 import {playMode} from 'common/js/config';
 import {shuffle} from 'common/js/util';
+import Lyric from 'lyric-parser';
 
 const transform = prefixStyle('transform');
 export default {
@@ -92,7 +93,8 @@ export default {
     return {
       songReady: false,
       currentTime: 0,
-      radius: 32
+      radius: 32,
+      currentLyric: null
     };
   },
   components: {
@@ -138,6 +140,12 @@ export default {
     }),
     updateTime(e) {
       this.currentTime = e.target.currentTime;
+    },
+    getLyric() {
+      this.currentSong.getLyric().then((lyric) => {
+        this.currentLyric = new Lyric(lyric);
+        console.log(this.currentLyric);
+      });
     },
     back() {
       this.setFullSCreen(false);
@@ -292,6 +300,7 @@ export default {
       }
       this.$nextTick(function() {
         this.$refs.audio.play();
+        this.getLyric();
       });
     },
     playing(newPlaying) {
