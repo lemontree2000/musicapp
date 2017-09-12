@@ -25,7 +25,7 @@
               </div>
             </div>
           </div>
-          <div class="middle-r" ref="lyriList">
+          <scroll :data="currentLyric && currentLyric.lines" class="middle-r" ref="lyriList">
             <div class="lyric-wrapper">
               <div v-if="currentLyric">
                 <p class="text"
@@ -38,7 +38,7 @@
                 </p>
               </div>
             </div>
-          </div>
+          </scroll>
         </div>
         <div class="bottom">
           <div class="progress-wrapper">
@@ -100,6 +100,7 @@ import progressCircle from 'base/progress-circle/progress-circle';
 import {playMode} from 'common/js/config';
 import {shuffle} from 'common/js/util';
 import Lyric from 'lyric-parser';
+import scroll from 'base/scroll/scroll';
 
 const transform = prefixStyle('transform');
 export default {
@@ -114,7 +115,8 @@ export default {
   },
   components: {
     progressBar,
-    progressCircle
+    progressCircle,
+    scroll
   },
   computed: {
     ...mapGetters([
@@ -162,12 +164,17 @@ export default {
         if (this.playing) {
           this.currentLyric.play();
         }
-        console.log(this.currentLyric);
       });
     },
     handleLyric({lineNum, txt}) {
-      this.currentLineNum = lineNum;
       console.log(lineNum);
+      this.currentLineNum = lineNum;
+      if (lineNum > 5) {
+        let lineEl = this.$refs.lyriceLine[lineNum - 5];
+        this.$refs.lyriList.scroll.scrollToElement(lineEl, 1000);
+      } else {
+        this.$refs.lyriList.scrollTo(0, 0, 1000);
+      }
     },
     back() {
       this.setFullSCreen(false);
