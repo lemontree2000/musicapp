@@ -1,6 +1,6 @@
 <template>
   <transition name="slide">
-    <music-list :title="title" :bg-image="bgImage"></music-list>
+    <music-list :title="title" :bg-image="bgImage" :songs="songs"></music-list>
   </transition>
 </template>
 
@@ -9,7 +9,14 @@ import MusicList from 'components/music-list/music-list';
 import {mapGetters} from 'vuex';
 import {getSongList} from 'api/recommend';
 import {ERR_OK} from 'api/config';
+import {createSong} from 'common/js/song';
+
 export default {
+  data() {
+    return {
+      songs: []
+    };
+  },
   components: {
     MusicList
   },
@@ -26,11 +33,26 @@ export default {
   },
   methods: {
     _getSongList() {
+      if (!this.disc.dissid) {
+        this.$router.back();
+        return;
+      }
       getSongList(this.disc.dissid).then((res) => {
         if (res.code === ERR_OK) {
-          console.log(res.cdlist[0].songlist);
+          let list = res.cdlist[0].songlist;
+          this.songs = this._normalizeSongs(list);
+          console.log(this.songs);
         }
       });
+    },
+    _normalizeSongs(list) {
+      let ret = [];
+      list.forEach(function(musicData) {
+        if (musicData.songid && musicData.albumid) {
+          ret.push(createSong(musicData));
+        }
+      }, this);
+      return ret;
     }
   },
   created() {
