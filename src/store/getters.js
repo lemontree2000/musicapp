@@ -15,3 +15,6 @@ export const mode = state => state.mode;
 export const currentSong = (state) => {
   return state.playList[state.currentIndex] || {};
 };
+
+export const disc = state => state.disc;
+

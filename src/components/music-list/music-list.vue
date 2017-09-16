@@ -31,11 +31,13 @@ import SongList from 'base/song-list/song-list';
 import {prefixStyle} from 'common/js/dom';
 import Loading from 'base/loading/loading';
 import {mapActions} from 'vuex';
+import {playlistMixin} from 'common/js/mixin';
 
 const transform = prefixStyle('transform');
 const backdrop = prefixStyle('backdrop-filter');
 const RESERVED_HEIGHT = 40;
 export default {
+  mixins: [playlistMixin],
   props: {
     bgImage: {
       type: String,
@@ -71,6 +73,11 @@ export default {
       'selectPlay',
       'randomPlay'
     ]),
+    handlePlayList(playList) {
+      const bottom = playList.length > 0 ? '60px' : '';
+      this.$refs.list.$el.style.bottom = bottom;
+      this.$refs.list.refresh();
+    },
     selectItem(item, index) {
       this.selectPlay({
         list: this.songs,

@@ -97,6 +97,9 @@ export default {
       this.touch.achorIndex = anchorIndex;
       this._scrollTo(anchorIndex);
     },
+    refresh() {
+      this.$refs.listview.refresh();
+    },
     onShortcurTouchMove(e) {
       let firstTouch = e.touches[0];
       this.touch.y2 = firstTouch.pageY;
