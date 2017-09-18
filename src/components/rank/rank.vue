@@ -1,26 +1,65 @@
 <template>
-  <div class="rank">
-    <div class="toplist">
+  <div class="rank" ref="rank">
+    <scroll :data="topList" class="toplist" ref="topList">
       <ul>
-        <li class="item">
+        <li class="item" v-for="item in topList" :key="item.picUrl">
           <div class="icon">
-            <img src="" width="100" height="100" alt="">
+            <img :src="item.picUrl" width="100" height="100" alt=".">
           </div>
           <ul class="songlist">
-            <li class="song">
-              <span></span>
-              <span></span>
+            <li class="song" v-for="(song, index) in item.songList" :key="index">
+              <span>{{index+1}}</span>
+              <span>{{song.songname}}-{{song.singername}}</span>
             </li>
           </ul>
         </li>
       </ul>
-    </div>
+      <div class="loading-container" v-show="!topList.length">
+        <v-loading></v-loading>
+      </div>
+    </scroll>
     <router-view></router-view>
   </div>  
 </template>
 
 <script>
-export default {};
+import {getTopList} from 'api/rank';
+import {ERR_OK} from 'api/config';
+import Scroll from 'base/scroll/scroll';
+import vLoading from 'base/loading/loading';
+import {playlistMixin} from 'common/js/mixin';
+
+export default {
+  mixins: [playlistMixin],
+  data() {
+    return {
+      topList: []
+    };
+  },
+  components: {
+    Scroll,
+    vLoading
+  },
+  methods: {
+    _getTopList() {
+      getTopList().then((res) => {
+        if (res.code === ERR_OK) {
+          this.topList = res.data.topList;
+        }
+      });
+    },
+    handlePlayList(playlist) {
+      const bottom = playlist.length ? '60px' : '';
+      this.$refs.rank.style.bottom = bottom;
+      console.log(this.$refs.rank.style.bottom);
+      this.$refs.topList.refresh();
+      console.log(playlist);
+    }
+  },
+  created() {
+    this._getTopList();
+  }
+};
 </script>
 
 <style lang="less" scoped>
@@ -54,7 +93,8 @@ export default {};
           flex-direction: column;
           justify-content: center;
           padding: 0 20px;
-          
+          height: 100px;
+          overflow: hidden;
         }
       }
     }
