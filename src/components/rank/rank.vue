@@ -105,7 +105,20 @@ export default {
           padding: 0 20px;
           height: 100px;
           overflow: hidden;
+          background: @color-highlight-background;
+          color: @color-text-d;
+          font-size: @font-size-small;
+          .song {
+            .no-wrap();
+            line-height: 26px;
+          }
         }
+      }
+      .loadding-container {
+        position: absolute;
+        width: 100%;
+        top: 50px;
+        transform: translateY(-50%);
       }
     }
   }
