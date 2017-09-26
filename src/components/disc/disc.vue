@@ -41,7 +41,6 @@ export default {
         if (res.code === ERR_OK) {
           let list = res.cdlist[0].songlist;
           this.songs = this._normalizeSongs(list);
-          console.log(this.songs);
         }
       });
     },

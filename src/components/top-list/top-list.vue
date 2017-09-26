@@ -45,14 +45,12 @@ export default {
       }
       getMusicList(this.topList.id).then((res) => {
         if (res.code === ERR_OK) {
-          console.log(res.data);
           this.songs = this._norlmalizeSongs(res.songlist);
         }
       });
     },
     _norlmalizeSongs(list) {
       let ret = [];
-      console.log(list);
       list.forEach(function(item) {
         const musicData = item.data;
         if (musicData.songid && musicData.albumid) {

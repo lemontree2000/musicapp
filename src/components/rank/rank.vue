@@ -61,9 +61,7 @@ export default {
     handlePlayList(playlist) {
       const bottom = playlist.length ? '60px' : '';
       this.$refs.rank.style.bottom = bottom;
-      console.log(this.$refs.rank.style.bottom);
       this.$refs.topList.refresh();
-      console.log(playlist);
     }
   },
   created() {
