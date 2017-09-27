@@ -28,7 +28,7 @@ import {createSong} from 'common/js/song';
 import Singer from 'common/js/singer';
 import Scroll from 'base/scroll/scroll';
 import Loading from 'base/loading/loading';
-import {mapMutations} from 'vuex';
+import {mapMutations, mapActions} from 'vuex';
 
 const TYPE_SINGER = 'singer';
 const perpage = 20;
@@ -103,6 +103,8 @@ export default {
           path: `/search/${singer.id}`
         });
         this.setSinger(singer);
+      } else {
+        this.insertSong(item);
       }
     },
     _checkMore(data) {
@@ -113,7 +115,7 @@ export default {
     },
     _genResult(data) {
       let ret = [];
-      if (data.zhida && data.zhida.singerId) {
+      if (data.zhida && data.zhida.singerid) {
         ret.push({...data.zhida, ...{type: TYPE_SINGER}});
       }
       if (data.song) {
@@ -132,7 +134,10 @@ export default {
     },
     ...mapMutations({
       setSinger: 'SET_SINGER'
-    })
+    }),
+    ...mapActions([
+      'insertSong'
+    ])
   },
   watch: {
     query() {

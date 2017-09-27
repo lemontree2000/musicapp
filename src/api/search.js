@@ -5,6 +5,7 @@ export function getHotKey() {
   const url = 'https://c.y.qq.com/splcloud/fcgi-bin/gethotkey.fcg';
 
   const data = Object.assign({}, commonParams, {
+    uin: 0,
     g_tk: 5381,
     platform: 'h5',
     needNewCode: 1
@@ -18,7 +19,7 @@ export function search(query, page, zhida, perpage) {
   const data = Object.assign({}, commonParams, {
     w: query,
     p: page,
-    catZhida: 1,
+    catZhida: zhida ? 1 : 0,
     zhidaqu: 1,
     t: 0,
     flag: 1,
@@ -28,7 +29,7 @@ export function search(query, page, zhida, perpage) {
     perpage,
     n: perpage,
     remoteplace: 'tex.mqq.all',
-    uid: 0,
+    uin: 0,
     needNewCode: 1,
     platform: 'h5'
   });
