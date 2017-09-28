@@ -12,3 +12,15 @@ export function shuffle(arr) {
   }
   return _arr;
 };
+
+export function debunce(func, delay) {
+  let Timer;
+  return function (...args) {
+    if (Timer) {
+      clearTimeout(Timer);
+    }
+    Timer = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+};

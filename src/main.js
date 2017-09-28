@@ -11,7 +11,8 @@ import 'common/less/index.less';
 fastclick.attach(document.body);
 
 Vue.use(VueLazyLoad, {
-  loading: require('common/image/default.png')
+  loading: require('common/image/default.png'),
+  error: require('common/image/default.1.png')
 });
 
 Vue.config.productionTip = false;
