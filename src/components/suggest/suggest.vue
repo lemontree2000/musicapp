@@ -3,6 +3,8 @@
           :pullup="pullup" 
           :data="result" 
           ref="suggest"
+          :beforeScroll="beforeScroll"
+          @beforeScroll="listScroll"
           @scrollToEnd="searchMore">
     <ul class="suggest-list">
       <li class="suggest-item" 
@@ -18,7 +20,7 @@
       </li>
       <loading v-show="hasMore" title=""></loading>
     </ul>
-    <div class="no-result-wrapper" v-show="!hosMore && !result.length">
+    <div class="no-result-wrapper" v-show="!hasMore && !result.length">
       <no-result title="暂无搜索结果"></no-result>
     </div>
   </scroll>
@@ -57,7 +59,8 @@ export default {
       page: 1,
       result: [],
       pullup: true,
-      hasMore: true
+      hasMore: true,
+      beforeScroll: true
     };
   },
   methods: {
@@ -136,6 +139,9 @@ export default {
         }
       }, this);
       return ret;
+    },
+    listScroll() {
+      this.$emit('listScroll');
     },
     ...mapMutations({
       setSinger: 'SET_SINGER'

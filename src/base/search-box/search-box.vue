@@ -1,13 +1,13 @@
 <template>
   <div class="search-box">
     <i class="icon-search"></i>
-    <input type="text" v-model="query" class="box" :placeholder="placeholder">
+    <input type="text" ref="elInput" v-model="query" class="box" :placeholder="placeholder">
     <i v-show="query" @click="clear" class="icon-dismiss"></i>
   </div>
 </template>
 
 <script>
-import {debounce} from 'common/js/util';
+import {debunce} from 'common/js/util';
 
 export default {
   props: {
@@ -25,14 +25,17 @@ export default {
     clear() {
       this.query = '';
     },
+    blur() {
+      this.$res.elInput.blur();
+    },
     setQuery(query) {
       this.query = query;
     }
   },
   created() {
-    this.$watch('query', debounce((newQuery) => {
+    this.$watch('query', debunce((newQuery) => {
       this.$emit('query', newQuery);
-    }, 200));
+    }, 300));
   }
 };
 </script>
