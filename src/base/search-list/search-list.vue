@@ -1,0 +1,46 @@
+<template>
+  <div class="search-list">
+    <ul>
+      <li class="search-item" v-for="item in searches" :key="item ">
+        <span class="text">{{item}}</span>
+        <span class="icon">
+          <i class="icon-delete"></i>
+        </span>
+      </li>
+    </ul>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    searches: {
+      type: Array,
+      default: []
+    }
+  }
+};
+</script>
+
+<style lang="less" scoped>
+  @import "~common/less/variable";
+  @import "~common/less/mixin";
+  .search-list {
+    .search-item {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      .text {
+        flex: 1;
+        color: @color-text-l;
+      }
+      .icon {
+        .extend-click();
+        .icon-delete {
+          font-size: @font-size-small;
+          color: @color-text-d;
+        }
+      }
+    }
+  }
+</style>

@@ -26,7 +26,7 @@ export default {
       this.query = '';
     },
     blur() {
-      this.$res.elInput.blur();
+      this.$refs.elInput.blur();
     },
     setQuery(query) {
       this.query = query;
