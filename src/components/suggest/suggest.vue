@@ -110,10 +110,11 @@ export default {
         this.$router.push({
           path: `/search/${singer.id}`
         });
-        this.setSinger(singer);
+        // this.setSinger(singer);
       } else {
-        this.insertSong(item);
+        // this.insertSong(item);
       }
+      this.$emit('select');
     },
     _checkMore(data) {
       const song = data.song;
