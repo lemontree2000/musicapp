@@ -1,7 +1,7 @@
 <template>
   <div class="search-list">
     <ul>
-      <li class="search-item" v-for="item in searches" :key="item ">
+      <li class="search-item" @click="selectItem(item)" v-for="item in searches" :key="item ">
         <span class="text">{{item}}</span>
         <span class="icon">
           <i class="icon-delete"></i>
@@ -17,6 +17,11 @@ export default {
     searches: {
       type: Array,
       default: []
+    }
+  },
+  methods: {
+    selectItem(item) {
+      this.$emit('select', item);
     }
   }
 };
