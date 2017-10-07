@@ -16,11 +16,11 @@
         <div class="search-history" v-show="searchHistory.length">
           <h1 class="title">
             <span class="text">搜索历史</span>
-            <span class="clear">
+            <span class="clear" @click="clearAll">
               <i class="icon-clear"></i>
             </span>
           </h1>
-          <search-list :searches="searchHistory"></search-list>
+          <search-list @delete="deleteOne" @select="addQuery" :searches="searchHistory"></search-list>
         </div>
       </div>
     </div>
@@ -63,11 +63,17 @@ export default {
     addQuery(key) {
       this.$refs.searchBox.setQuery(key);
     },
+    clearAll() {
+      this.clearSearchHistory();
+    },
     blurInput() {
       this.$refs.searchBox.blur();
     },
     saveSearch() {
       this.saveSearchHistory(this.query);
+    },
+    deleteOne(item) {
+      this.deleteSearchHistory(item);
     },
     _getHotKey() {
       getHotKey().then((res) => {
@@ -80,7 +86,9 @@ export default {
       this.query = query;
     },
     ...mapActions([
-      'saveSearchHistory'
+      'saveSearchHistory',
+      'deleteSearchHistory',
+      'clearSearchHistory'
     ])
   }
 };
