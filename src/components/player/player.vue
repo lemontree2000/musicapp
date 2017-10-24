@@ -91,12 +91,12 @@
             <i :class="miniIcon" @click.prevent.stop="togglePlaying" class="icon-mini"></i>
           </progress-circle>
         </div>
-        <div class="control">
+        <div class="control" @click.stop="showPlayList">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
-    <play-list></play-list>
+    <play-list ref="playList"></play-list>
     <audio ref="audio" :src="currentSong.url" @ended="end" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
@@ -170,6 +170,9 @@ export default {
       setPlayMode: 'SET_PLAY_MODE',
       setPlayList: 'SET_PLAYLIST'
     }),
+    showPlayList() {
+      this.$refs.playList.show();
+    },
     updateTime(e) {
       this.currentTime = e.target.currentTime;
     },

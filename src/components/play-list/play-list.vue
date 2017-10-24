@@ -1,7 +1,7 @@
 <template>
   <transition name="list-fade">
-    <div class="playlist">
-      <div class="list-wrapper">
+    <div class="playlist" v-show="showFlag" @click="hide">
+      <div class="list-wrapper" @click.stop>
         <div class="list-header">
           <h1 class="title">
             <i class="icon"></i>
@@ -11,11 +11,11 @@
             </span>
           </h1>
         </div>
-        <div class="list-content">
+        <scroll ref="playlistScroll" :data="sequenceList" class="list-content">
           <ul>
-            <li class="item">
-              <i class="current"></i>
-              <span class="text"></span>
+            <li class="item" @click="selectItem(item, index)" v-for="(item, index) in sequenceList" :key="item.id">
+              <i class="current" :class="getCurrentIcon(item)"></i>
+              <span class="text">{{item.name}}</span>
               <span class="like">
                 <i class="icon-not-favorite"></i>                
               </span>
@@ -24,14 +24,14 @@
               </span>
             </li>
           </ul>
-        </div>
+        </scroll>
         <div class="list-operate">
           <div class="add">
             <i class="icon-add"></i>
             <span class="text">添加歌曲到队列</span>
           </div>
         </div>
-        <div class="list-close">
+        <div class="list-close" @click.stop="hide">
           <span>关闭</span>
         </div>
       </div>
@@ -40,7 +40,56 @@
 </template>
 
 <script>
+import {mapGetters, mapMutations} from 'vuex';
+import Scroll from 'base/scroll/scroll';
+import {playMode} from 'common/js/config';
+
 export default {
+  data() {
+    return {
+      showFlag: false
+    };
+  },
+  methods: {
+    show() {
+      this.showFlag = true;
+      setTimeout(() => {
+        this.$refs.playlistScroll.refresh();
+      }, 20);
+    },
+    hide() {
+      this.showFlag = false;
+    },
+    selectItem(item, index) {
+      if (this.mode === playMode.random) {
+        index = this.playList.findIndex((song) => {
+          return song.id === item.id;
+        });
+      }
+      this.setCurrentIndex(index);
+      this.setPlayingState(true);
+    },
+    getCurrentIcon(item) {
+      if (this.currentSong.id === item.id) {
+        return 'icon-play';
+      }
+      return '';
+    },
+    ...mapMutations({
+      'setCurrentIndex': 'SET_CURRENT_INDEX',
+      'setPlayingState': 'SET_PLAYING_STATE'
+    })
+  },
+  computed: {
+    ...mapGetters([
+      'sequenceList',
+      'currentSong',
+      'mode'
+    ])
+  },
+  components: {
+    Scroll
+  }
 };
 </script>
 
