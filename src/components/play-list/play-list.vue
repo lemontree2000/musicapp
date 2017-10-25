@@ -13,7 +13,7 @@
         </div>
         <scroll ref="playlistScroll" :data="sequenceList" class="list-content">
           <ul>
-            <li class="item" @click="selectItem(item, index)" v-for="(item, index) in sequenceList" :key="item.id">
+            <li ref="listItem" class="item" @click="selectItem(item, index)" v-for="(item, index) in sequenceList" :key="item.id">
               <i class="current" :class="getCurrentIcon(item)"></i>
               <span class="text">{{item.name}}</span>
               <span class="like">
@@ -55,6 +55,7 @@ export default {
       this.showFlag = true;
       setTimeout(() => {
         this.$refs.playlistScroll.refresh();
+        this.scrollToCurrent(this.currentSong);
       }, 20);
     },
     hide() {
@@ -68,6 +69,12 @@ export default {
       }
       this.setCurrentIndex(index);
       this.setPlayingState(true);
+    },
+    scrollToCurrent(current) {
+      const index = this.sequenceList.findIndex((song) => {
+        return current.id === song.id;
+      });
+      this.$refs.playlistScroll.scrollToElement(this.$refs.listItem[index]);
     },
     getCurrentIcon(item) {
       if (this.currentSong.id === item.id) {
@@ -86,6 +93,14 @@ export default {
       'currentSong',
       'mode'
     ])
+  },
+  watch: {
+    currentSong(newSong, oldSong) {
+      if (!this.showFlag || newSong.id === oldSong.id) {
+        return;
+      }
+      this.scrollToCurrent(newSong);
+    }
   },
   components: {
     Scroll
