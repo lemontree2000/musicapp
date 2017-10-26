@@ -12,18 +12,18 @@
           </h1>
         </div>
         <scroll ref="playlistScroll" :data="sequenceList" class="list-content">
-          <ul>
+          <transition-group name="list" tag="ul">
             <li ref="listItem" class="item" @click="selectItem(item, index)" v-for="(item, index) in sequenceList" :key="item.id">
               <i class="current" :class="getCurrentIcon(item)"></i>
               <span class="text">{{item.name}}</span>
               <span class="like">
                 <i class="icon-not-favorite"></i>                
               </span>
-              <span class="delete">
+              <span class="delete" @click.stop="deleteOne(item)">
                 <i class="icon-delete"></i>
               </span>
             </li>
-          </ul>
+          </transition-group>
         </scroll>
         <div class="list-operate">
           <div class="add">
@@ -35,13 +35,15 @@
           <span>关闭</span>
         </div>
       </div>
+      <confirm ref="confirm" text="是否清空播放列表" confirmText="清空"></confirm>
     </div>
   </transition>
 </template>
 
 <script>
-import {mapGetters, mapMutations} from 'vuex';
+import {mapGetters, mapMutations, mapActions} from 'vuex';
 import Scroll from 'base/scroll/scroll';
+import Confirm from 'base/confirm/confirm';
 import {playMode} from 'common/js/config';
 
 export default {
@@ -60,6 +62,10 @@ export default {
     },
     hide() {
       this.showFlag = false;
+    },
+    deleteOne(item) {
+      console.log(item);
+      this.deleteSong(item);
     },
     selectItem(item, index) {
       if (this.mode === playMode.random) {
@@ -85,7 +91,10 @@ export default {
     ...mapMutations({
       'setCurrentIndex': 'SET_CURRENT_INDEX',
       'setPlayingState': 'SET_PLAYING_STATE'
-    })
+    }),
+    ...mapActions([
+      'deleteSong'
+    ])
   },
   computed: {
     ...mapGetters([
