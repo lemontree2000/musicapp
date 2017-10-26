@@ -4,9 +4,9 @@
       <div class="list-wrapper" @click.stop>
         <div class="list-header">
           <h1 class="title">
-            <i class="icon"></i>
-            <span class="text"></span>
-            <span class="clear">
+            <i class="icon" @click="changeMode" :class="iconMode"></i>
+            <span class="text">{{modeText}}</span>
+            <span class="clear" @click="showConfirm">
               <i class="icon-clear"></i>
             </span>
           </h1>
@@ -35,18 +35,20 @@
           <span>关闭</span>
         </div>
       </div>
-      <confirm ref="confirm" text="是否清空播放列表" confirmText="清空"></confirm>
+      <confirm ref="confirm" @confirm="confirmClear" text="是否清空播放列表" confirmText="清空"></confirm>
     </div>
   </transition>
 </template>
 
 <script>
-import {mapGetters, mapMutations, mapActions} from 'vuex';
+import {mapActions} from 'vuex';
 import Scroll from 'base/scroll/scroll';
 import Confirm from 'base/confirm/confirm';
 import {playMode} from 'common/js/config';
+import {playerMixin} from 'common/js/mixin';
 
 export default {
+  mixins: [playerMixin],
   data() {
     return {
       showFlag: false
@@ -66,6 +68,13 @@ export default {
     deleteOne(item) {
       console.log(item);
       this.deleteSong(item);
+    },
+    confirmClear() {
+      this.deleteSongList();
+      this.hide();
+    },
+    showConfirm() {
+      this.$refs.confirm.show();
     },
     selectItem(item, index) {
       if (this.mode === playMode.random) {
@@ -88,20 +97,15 @@ export default {
       }
       return '';
     },
-    ...mapMutations({
-      'setCurrentIndex': 'SET_CURRENT_INDEX',
-      'setPlayingState': 'SET_PLAYING_STATE'
-    }),
     ...mapActions([
-      'deleteSong'
+      'deleteSong',
+      'deleteSongList'
     ])
   },
   computed: {
-    ...mapGetters([
-      'sequenceList',
-      'currentSong',
-      'mode'
-    ])
+    modeText() {
+      return this.mode === playMode.sequence ? '顺序播放' : this.mode === playMode.random ? '随机播放' : '单曲循环';
+    }
   },
   watch: {
     currentSong(newSong, oldSong) {
@@ -112,7 +116,8 @@ export default {
     }
   },
   components: {
-    Scroll
+    Scroll,
+    Confirm
   }
 };
 </script>
