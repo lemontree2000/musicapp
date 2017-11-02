@@ -38,11 +38,11 @@
 import SearchBox from 'base/search-box/search-box';
 import Suggest from 'components/suggest/suggest';
 import SearchList from 'base/search-list/search-list';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions } from 'vuex';
 import Scroll from 'base/scroll/scroll';
 import { getHotKey } from 'api/search';
 import confirm from 'base/confirm/confirm';
-import {playlistMixin} from 'common/js/mixin';
+import {playlistMixin, searchMixin} from 'common/js/mixin';
 import { ERR_OK } from 'api/config';
 
 export default {
@@ -53,7 +53,7 @@ export default {
     confirm,
     Scroll
   },
-  mixins: [playlistMixin],
+  mixins: [playlistMixin, searchMixin],
   data() {
     return {
       hotKey: [],
@@ -66,10 +66,7 @@ export default {
   computed: {
     shortcut() {
       return this.hotKey.concat(this.searchHistory);
-    },
-    ...mapGetters([
-      'searchHistory'
-    ])
+    }
   },
   methods: {
     handlePlayList(playlist) {
@@ -79,20 +76,11 @@ export default {
       this.$refs.shortcut.refresh();
       this.$refs.suggest.refresh();
     },
-    addQuery(key) {
-      this.$refs.searchBox.setQuery(key);
-    },
     clearAll() {
       this.clearSearchHistory();
     },
     showConfirm() {
       this.$refs.confirm.show();
-    },
-    blurInput() {
-      this.$refs.searchBox.blur();
-    },
-    saveSearch() {
-      this.saveSearchHistory(this.query);
     },
     deleteOne(item) {
       this.deleteSearchHistory(item);
@@ -103,9 +91,6 @@ export default {
           this.hotKey = res.data.hotkey.slice(0, 10);
         }
       });
-    },
-    getQuery(query) {
-      this.query = query;
     },
     ...mapActions([
       'saveSearchHistory',
