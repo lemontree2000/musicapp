@@ -4,7 +4,7 @@
                 @enter="enter"
                 @after-enter="afterEnter"
                 @leave="leave"
-                @after-leave="afterLeave"         
+                @after-leave="afterLeave"
     >
       <div class="normal-player" v-show="fullScreen">
         <div class="background">
@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import {mapGetters, mapMutations} from 'vuex';
+import {mapGetters, mapMutations, mapActions} from 'vuex';
 import animations from 'create-keyframe-animation';
 import {prefixStyle} from 'common/js/dom';
 import progressBar from 'base/progress-bar/progress-bar';
@@ -160,6 +160,9 @@ export default {
     ...mapMutations({
       setFullSCreen: 'SET_FULL_SCREEN'
     }),
+    ...mapActions([
+      'savePlayHistory'
+    ]),
     showPlayList() {
       this.$refs.playList.show();
     },
@@ -308,6 +311,7 @@ export default {
     },
     ready() {
       this.songReady = true;
+      this.savePlayHistory(this.currentSong);
     },
     error() {
       this.songReady = true;
@@ -418,7 +422,7 @@ export default {
 <style lang="less" scoped>
   @import "~common/less/variable";
   @import "~common/less/mixin";
-  
+
   .player {
     .normal-player {
       position: fixed;
@@ -469,7 +473,7 @@ export default {
           font-size: @font-size-medium;
           color: @color-text;
         }
-      }  
+      }
       .middle {
         position: fixed;
         width: 100%;
@@ -511,7 +515,7 @@ export default {
                 border-radius: 50%;
               }
             }
-          }  
+          }
           .playing-lyric-wrapper {
             width: 80%;
             margin: 30px auto 0 auto;
@@ -622,7 +626,7 @@ export default {
             color: @color-sub-theme;
           }
         }
-      }  
+      }
       &.normal-enter-active, &.normal-leave-active {
         transition: all 0.4s;
         .top, .bottom {
@@ -651,7 +655,7 @@ export default {
       background: @color-highlight-background;
       &.mini-enter-active, &.mini-leave-active {
         transition: all 0.4s
-      } 
+      }
       &.mini-enter, &.mini-leave-to {
         opacity: 0
       }
@@ -710,7 +714,7 @@ export default {
       transform: rotate(0);
     }
     100% {
-      transform: rotate(360deg);  
+      transform: rotate(360deg);
     }
   }
 </style>
