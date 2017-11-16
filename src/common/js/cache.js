@@ -2,6 +2,8 @@ import storage from 'good-storage';
 
 const SEARCH_KEY = '__search__';
 const PLAY_KEY = '__play__';
+const FAVORITE_KEY = '__favorite__';
+const FAVORITE_MAX_LENGTH = 200;
 const PLAY_MAX_LENGTH = 200;
 const SEARCH_MAX_LENGTH = 15;
 
@@ -64,4 +66,26 @@ export function savePlay(song) {
 
 export function loadPlay() {
   return storage.get(PLAY_KEY, []);
+}
+
+export function saveFavorite(song) {
+  let songs = storage.get(FAVORITE_KEY, []);
+  insertArray(songs, song, (item) => {
+    return song.id === item.id;
+  }, FAVORITE_MAX_LENGTH);
+  storage.set(FAVORITE_KEY, songs);
+  return songs;
+}
+
+export function deleteFavorite(song) {
+  let songs = storage.get(FAVORITE_KEY, []);
+  deleteFromArray(songs, (item) => {
+    return song.id === item.id;
+  });
+  storage.set(FAVORITE_KEY, songs);
+  return songs;
+}
+
+export function loadFavorite() {
+  return storage.get(FAVORITE_KEY, []);
 }

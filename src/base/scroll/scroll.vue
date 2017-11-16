@@ -31,6 +31,10 @@ export default {
     beforeScroll: {
       type: Boolean,
       default: false
+    },
+    refreshDelay: {
+      type: Number,
+      default: 20
     }
   },
   methods: {
@@ -78,8 +82,8 @@ export default {
   watch: {
     data() {
       setTimeout(() => {
-        this.scroll.refresh();
-      }, 20);
+        this.refresh();
+      }, this.refreshDelay);
     }
   },
   mounted() {
