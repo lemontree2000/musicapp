@@ -1,7 +1,7 @@
 <template>
   <transition name="slide">
     <div class="user-center">
-      <div class="back">
+      <div class="back" @click="back">
         <i class="icon-back"></i>
       </div>
       <div class="switches-wrapper">
@@ -54,6 +54,9 @@ export default {
     },
     selectSong(song) {
       this.insertSong(new Song(song));
+    },
+    back() {
+      this.$router.back();
     },
     ...mapActions([
       'insertSong'
