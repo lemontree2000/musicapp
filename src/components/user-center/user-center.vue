@@ -7,7 +7,7 @@
       <div class="switches-wrapper">
         <switches :switches="switchesData" @switch="switchItem" :currentIndex="currentIndex"></switches>
       </div>
-      <div class="play-btn" ref="playBtn">
+      <div class="play-btn" @click="random" ref="playBtn">
         <i class="icon-play"></i>
         <span class="text">随机播放全部</span>
       </div>
@@ -23,6 +23,9 @@
           </div>
         </scroll>
       </div>
+      <div class="no-result-wrapper" v-show="noResult">
+        <no-result :title="noResultText"></no-result>
+      </div>
     </div>
   </transition>
 </template>
@@ -33,12 +36,17 @@ import Scroll from 'base/scroll/scroll';
 import SongList from 'base/song-list/song-list';
 import Song from 'common/js/song';
 import {mapGetters, mapActions} from 'vuex';
+import {playlistMixin} from 'common/js/mixin';
+import NoResult from 'base/no-result/no-result';
+
 export default {
   components: {
     switches,
     SongList,
-    Scroll
+    Scroll,
+    NoResult
   },
+  mixins: [playlistMixin],
   data() {
     return {
       switchesData: [
@@ -49,20 +57,51 @@ export default {
     };
   },
   methods: {
+    handlePlayList(playlist) {
+      const bottom = playlist.length > 0 ? '60px' : '';
+      this.$refs.listWrapper.style.bottom = bottom;
+      this.$refs.favoriteList && this.$refs.favoriteList.refresh();
+      this.$refs.playList && this.$refs.playList.refresh();
+    },
     switchItem(index) {
       this.currentIndex = index;
     },
     selectSong(song) {
       this.insertSong(new Song(song));
     },
+    random() {
+      let list = this.currentIndex === 0 ? this.favoriteList : this.playHistory;
+      if (list.length === 0) {
+        return;
+      }
+      list = list.map((song) => {
+        return new Song(song);
+      });
+      this.randomPlay({list});
+    },
     back() {
       this.$router.back();
     },
     ...mapActions([
-      'insertSong'
+      'insertSong',
+      'randomPlay'
     ])
   },
   computed: {
+    noResultText() {
+      if (this.currentIndex === 0) {
+        return '暂无收藏歌曲';
+      } else {
+        return '你还没听过歌曲';
+      }
+    },
+    noResult() {
+      if (this.currentIndex === 0) {
+        return !this.favoriteList.length;
+      } else {
+        return !this.playHistory.length;
+      }
+    },
     ...mapGetters([
       'favoriteList',
       'playHistory'
@@ -141,6 +180,9 @@ export default {
         top: 50%;
         transform: translateY(-50%);
       }
+    }
+    .no-result-wrapper {
+      margin-top: 50px;
     }
   }
 </style>
